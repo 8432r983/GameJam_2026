@@ -55,7 +55,6 @@ int main(void)
         DrawRectangle((int)X, (int)Y, rwidth, rheight, RED);
 
         EndDrawing();
-
     }
 
     CloseWindow();
