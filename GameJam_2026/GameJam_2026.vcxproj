@@ -135,6 +135,9 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="test.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
