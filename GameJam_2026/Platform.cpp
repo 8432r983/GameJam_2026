@@ -18,3 +18,8 @@ void Platform::changeColor(Color newColor)
 {
 	color = newColor;
 }
+
+void Platform::drawPlatform()
+{
+	DrawRectangle(posX, posY, width, height, color);
+}

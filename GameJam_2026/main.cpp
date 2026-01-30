@@ -17,8 +17,6 @@ int main(void)
 
         ClearBackground(WHITE);
 
-
-
         EndDrawing();
     }
 

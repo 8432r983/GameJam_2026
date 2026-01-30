@@ -17,5 +17,6 @@ class Platform
 public:
 	bool isColliding(const int& x, const int& y);
 	void changeColor(Color newColor);
+	void drawPlatform();
 };
 
