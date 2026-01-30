@@ -52,7 +52,8 @@ int main(void)
             vely = -vely;
         }
 
-        DrawRectangle((int)X, (int)Y, rwidth, rheight, RED);
+        khdjahkjd
+        DrawRectangle((int)X, (int)Y, rwidth, rheight, GREEN);
 
         EndDrawing();
 
