@@ -4,6 +4,7 @@
 
 class Platform
 {
+public:
 	int width;
 	int height;
 
@@ -14,7 +15,7 @@ class Platform
 
 	Platform(int w, int h, int x, int y);
 
-public:
+
 	bool isColliding(const int& x, const int& y);
 	void changeColor(Color newColor);
 	void drawPlatform();
