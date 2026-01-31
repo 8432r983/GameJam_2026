@@ -2,6 +2,7 @@
 #include <cmath>
 
 #include "PlatformHandler.h"
+#include "Player.h"
 
 #include <iostream>
 
@@ -14,6 +15,10 @@ float speed = 0.5f;
 float fric = 0.05f;
 int rad = 20;
 
+float smoothSpeed = 4.5f;
+
+float delayedPlayerX = 0.0f;
+float delayedPlayerY = 0.0f;
 
 int main(void)
 {
@@ -26,16 +31,30 @@ int main(void)
     camera.target = { playerX + 20.0f, playerY + 20.0f };
     camera.offset = { screenWidth / 2.0f, screenHeight / 2.0f };
     camera.rotation = 0.0f;
-    camera.zoom = 1.0f;
+    camera.zoom = 0.85f;
 
-    PlatformHandler platHandler(screenWidth, screenHeight, 1);
+    PlatformHandler platHandler(screenWidth, screenHeight, 13);
+
+    Player mainPlayer(400,170);
 
     while (!WindowShouldClose())
     {
-        if(IsKeyDown(KEY_W)) velY -= speed;
-        if(IsKeyDown(KEY_A)) velX -= speed;
-        if(IsKeyDown(KEY_S)) velY += speed;
-        if(IsKeyDown(KEY_D)) velX += speed;
+        //if(IsKeyDown(KEY_W)) velY -= speed;
+        //if(IsKeyDown(KEY_A)) velX -= speed;
+        //if(IsKeyDown(KEY_S)) velY += speed;
+        //if(IsKeyDown(KEY_D)) velX += speed;
+        
+        //std::cout << platHandler.m_loader.getPlatformsCnt() << '\n';
+
+        mainPlayer.move();
+        mainPlayer.dash();
+        for (int i = 0; i < platHandler.m_loader.getPlatformsCnt(); i++) {
+            mainPlayer.colidingCheck(platHandler.m_loader.getPlatform(i));
+        }
+        mainPlayer.updatePosition();
+
+        playerX = mainPlayer.posX;
+        playerY = mainPlayer.posY;
 
         platHandler.updateMap({ playerX, playerY });
 
@@ -47,13 +66,25 @@ int main(void)
             camera.rotation = 0.0f;
         }
         
-        playerX += velX;
-        playerY += velY;
+        smoothSpeed = std::max((abs(velX)*abs(velY)), 4.5f);
 
-        velX -= fric * -1 * (velX <= 0) + fric * (velX > 0);
-        velY -= fric * -1 * (velY <= 0) + fric * (velY > 0);
+        //playerX += velX;
+        //playerY += velY;
+        //
+        //velX -= fric * -1 * (velX <= 0) + fric * (velX > 0);
+        //velY -= fric * -1 * (velY <= 0) + fric * (velY > 0);
 
-        camera.target = { playerX + 20, playerY + 20 };
+        camera.target = { delayedPlayerX + 20.0f, delayedPlayerY + 20.0f };
+
+        if (delayedPlayerX != playerX) {
+            if (abs(delayedPlayerX - playerX) <= smoothSpeed) { delayedPlayerX = playerX; smoothSpeed = 4.5f; }
+            else delayedPlayerX += -smoothSpeed * (playerX - delayedPlayerX <= 0) + smoothSpeed * (playerX - delayedPlayerX > 0);
+        }
+
+        if (delayedPlayerY != playerY) {
+            if (abs(delayedPlayerY - playerY) <= smoothSpeed) { delayedPlayerY = playerY; smoothSpeed = 4.5f; }
+            else delayedPlayerY += -smoothSpeed * (playerY - delayedPlayerY <= 0) + smoothSpeed * (playerY - delayedPlayerY > 0);
+        }
 
         BeginDrawing();
 
@@ -63,7 +94,8 @@ int main(void)
 
         BeginMode2D(camera);
 
-        DrawCircle((int)playerX, (int)playerY, rad, GREEN);
+        //DrawCircle((int)playerX, (int)playerY, rad, GREEN);
+        mainPlayer.drawPlayer();
         platHandler.m_loader.drawPlatforms();
 
         EndMode2D();
@@ -71,8 +103,8 @@ int main(void)
         EndDrawing();
     }
        
-    UnloadTexture(playerUP_texture);
-    UnloadTexture(playerDOWN_texture);
+    //UnloadTexture(playerUP_texture);
+    //UnloadTexture(playerDOWN_texture);
     CloseWindow();
 
     return 0;

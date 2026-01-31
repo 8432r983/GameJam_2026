@@ -1,6 +1,7 @@
 #include "PlatformHandler.h"
 #include <cmath>
 #include <algorithm>
+#include <unordered_map>
 
 unsigned int PlatformHandler::getSeedFromCoord(const Vector2& coord)
 {
@@ -101,10 +102,21 @@ void PlatformHandler::getRndPlatforms(const int& heightLim, const int& widthLim,
 void PlatformHandler::cleanupPlatforms(const Vector2& playerPos, const long long& limDist)
 {
 	std::vector<Platform> newPlatforms;
+	std::unordered_map<long long, bool> mep;
+
+	auto createId = [](int posX, int posY) {
+		long long res = (long long)(posX << 32) + (long long)posY;
+		return res;
+	};
+
 	for (int i = 0; i < m_loader.getPlatformsCnt(); i++) {
 		long long dist = m_loader.getDist(playerPos, i);
-		if (dist <= limDist) {
+		int posx = m_loader.getPlatform(i).pos.x;
+		int posy = m_loader.getPlatform(i).pos.y;
+
+		if (dist <= limDist && !mep[createId(posx,posy)]) {
 			newPlatforms.push_back(m_loader.getPlatform(i));
+			mep[createId(posx, posy)] = true;
 		}
 	}
 	m_loader.clearPlatforms();

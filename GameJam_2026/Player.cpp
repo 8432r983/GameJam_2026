@@ -1,78 +1,99 @@
 #include "Player.h"
+#include <algorithm>
+#include <iostream>
+
+const int JUMP_FRAMES_COOLDOWN = 20;
 
 Player::Player(int x, int y)
 {
 	posX = x; //position X
 	posY = y; //position Y
 
-	height = 200; //player height
-	width = 139.1; //player width
+	height = 70; //200; //player height
+	width = 45; //139.1; //player width
 	
-	
-	velocity_x = 0; 
-	velocity_y = 0;
-	acceleration_x = 0;
-	acceleration_y = 0;
+	velX = 0.f; 
+	velY = 0.f;
 
-	speed = 2; //movement speed
-	friction = 0.15; //friction coefficient
-	jump = 7; //jump strength
+	floorCollider.x = posX;
+	floorCollider.width = width;
+	floorCollider.height = width / 4;
+	floorCollider.y = posY + height - floorCollider.height;
+
+	speed = 1.2; //movement speed
+	friction = 0.45; //friction coefficient
+	jumpForce = 9.f; //jump strength
 	dashSpeed = 0.015 ; //dash speed
+	
+	gravity = 1.5f;
 
+	isDashing = false;
+	isColiding = false;
+	onFloor = false;
 
-
-	ground = false;
+	isColidingTime = JUMP_FRAMES_COOLDOWN + 1;
 }
-void Player::leftright()
+
+void Player::move()
 {
-	acceleration_x = 0;
-	
-
-	if (IsKeyDown(KEY_A)) acceleration_x += -1 * speed;
-	if (IsKeyDown(KEY_D)) acceleration_x += speed;
-}
-	void Player::move(){
-	
-	acceleration_x -= velocity_x * friction;
-	acceleration_y = 0.3; //gravity
-
-	velocity_x += acceleration_x;
-	velocity_y += acceleration_y;
-
-	posX += velocity_x;
-	posY += velocity_y;
-
-	if (ground){
-		velocity_y = 0;
+	if (IsKeyPressed(KEY_W) && isColiding) {
+		velY -= jumpForce; // jumping
+		isColidingTime = 0;
 	}
-		
-	//https://www.youtube.com/watch?v=5Ui51gD3uRE&list=PLCC34OHNcOtpOG96Uwh3VGkmpZ7qTB5dx&index=26
-}
-void Player::jumping()
-{
-	if (IsKeyDown(KEY_W) && ground) velocity_y += -1 * jump;
+	
+	if (IsKeyDown(KEY_A)) velX -= speed;
+	if (IsKeyDown(KEY_D)) velX += speed;
 }
 void Player::dash()
-{	
-	
-	if (IsKeyDown(KEY_SPACE)) {
-		if (GetMousePosition().y > posY) velocity_y += (GetMousePosition().y) * dashSpeed;
-		else velocity_y += -1 * (GetMousePosition().y) * dashSpeed;
-		
-		if (GetMousePosition().x > posX) acceleration_x += (GetMousePosition().x) * dashSpeed;
-		else acceleration_x += -1 * (GetMousePosition().x) * dashSpeed;
-	}
-
+{
+	//if (IsKeyDown(KEY_SPACE)) {
+	//	if (GetMousePosition().y > posY) velocity_y += (GetMousePosition().y) * dashSpeed;
+	//	else velocity_y += -1 * (GetMousePosition().y) * dashSpeed;
+	//
+	//	if (GetMousePosition().x > posX) acceleration_x += (GetMousePosition().x) * dashSpeed;
+	//	else acceleration_x += -1 * (GetMousePosition().x) * dashSpeed;
+	//}
 }
 void Player::drawPlayer()
 {
-	DrawRectangle(posX, posY, width, height, BLANK);
+	//DrawRectangle(posX, posY, width, height, BLANK);
+	DrawRectangle(posX, posY, width, height, RED);
+	//DrawRectangle(floorCollider.x, floorCollider.y, floorCollider.width, floorCollider.height, YELLOW);
 }
-void Player::movement()
+
+void Player::colidingCheck(const Platform& platform)
 {
-	move();
-	leftright();
-	dash();
-	jumping();
+	isColiding = std::max(isColiding, CheckCollisionRecs(floorCollider, {platform.pos.x,platform.pos.y,(float)platform.width,(float)platform.height})
+							&& !isDashing);
+
+	floorCollider.x = posX;
+	floorCollider.width = width;
+	floorCollider.height = width / 4;
+	floorCollider.y = posY + height - floorCollider.height;
+}
+
+void Player::updatePosition()
+{
+	//std::cout << isColiding << " " << posX << " " << posY << '\n';
+
+	velX += -friction*(velX > 0) + friction*(velX < 0);
+	if (abs(velX) <= friction) velX = 0.f;
+
+	if (isColidingTime < JUMP_FRAMES_COOLDOWN) {
+		velY = -jumpForce;
+		isColiding = false;
+	}
+	else {
+		if (!isColiding) {
+			velY += gravity;
+			velY = std::min(velY, 30.f);
+		}
+		else velY = 0;
+	}
+	isColidingTime++;
+
+	posX += velX;
+	posY += velY;
 	
+	//https://www.youtube.com/watch?v=5Ui51gD3uRE&list=PLCC34OHNcOtpOG96Uwh3VGkmpZ7qTB5dx&index=26
 }

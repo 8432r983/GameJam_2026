@@ -1,41 +1,41 @@
 #pragma once
 
 #include <raylib.h>
-class Player
+#include "Platform.h"
 
+class Player
 {
 public:
-
 	int posX;
 	int posY;
 
 	float height;
 	float width;
 
-
-
-	float velocity_x;
-	float velocity_y;
-	float acceleration_x;
-	float acceleration_y;
+	float velX;
+	float velY;
 
 	float speed;
 	float friction;
-	float jump;
+	float jumpForce;
 	float dashSpeed;
 
-	bool ground;
+	float gravity;
 
+	int isColidingTime;
+
+	bool isDashing;
+	bool isColiding;
+	bool onFloor;
+
+	Rectangle floorCollider;
 
 	Player(int x, int y);
 
-	void leftright();
-	void jumping();
-	void dash();
 	void move();
+	void dash();
+	void updatePosition();
 	void drawPlayer();
-	void movement();
-	
-
+	void colidingCheck(const Platform& platform);
 }; 
 
