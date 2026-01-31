@@ -57,6 +57,8 @@ int main(void)
 
         BeginDrawing();
 
+        BeginMode2D(camera);
+
         ClearBackground(WHITE);
 
         BeginMode2D(camera);
@@ -68,7 +70,9 @@ int main(void)
 
         EndDrawing();
     }
-
+       
+    UnloadTexture(playerUP_texture);
+    UnloadTexture(playerDOWN_texture);
     CloseWindow();
 
     return 0;
