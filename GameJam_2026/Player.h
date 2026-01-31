@@ -12,6 +12,11 @@ public:
 	float height;
 	float width;
 
+	char facing;
+	bool running;
+	bool hitting;
+	bool inAir;
+	bool inJump;
 
 
 	float velocity_x;
@@ -26,6 +31,8 @@ public:
 
 	bool ground;
 
+	int heatlh = 100;
+
 
 	Player(int x, int y);
 
@@ -33,8 +40,9 @@ public:
 	void jumping();
 	void dash();
 	void move();
+	void hit();
 	void drawPlayer();
-	void movement();
+	void update();
 	
 
 }; 
