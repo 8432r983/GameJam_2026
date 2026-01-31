@@ -1,22 +1,17 @@
 #pragma once
 
 #include <raylib.h>
-class Player
+#include "Platform.h"
 
+class Player
 {
 public:
-
 	int posX;
 	int posY;
 
 	float height;
 	float width;
 
-	char facing;
-	bool running;
-	bool hitting;
-	bool inAir;
-	bool inJump;
 
 
 	float velocity_x;
@@ -26,23 +21,21 @@ public:
 
 	float speed;
 	float friction;
-	float jump;
+	float jumpForce;
 	float dashSpeed;
 
-	bool ground;
+	float gravity;
 
-	int heatlh = 100;
+	int isColidingTime;
 
 
 	Player(int x, int y);
 
-	void leftright();
-	void jumping();
+	void move();
 	void dash();
 	void move();
-	void hit();
 	void drawPlayer();
-	void update();
+	void movement();
 	
 
 }; 
