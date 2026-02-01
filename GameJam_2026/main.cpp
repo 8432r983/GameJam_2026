@@ -54,7 +54,7 @@ int main(void)
     camera.target = Vector2{ player.posX + 20.0f, player.posY + 20.0f }; 
     camera.offset = Vector2{ screenWidth / 2.0f, screenHeight / 2.0f };
     camera.rotation = 0.0f;
-    camera.zoom = 0.35f;
+    camera.zoom = 0.85f;
 
     while (!WindowShouldClose())
     {

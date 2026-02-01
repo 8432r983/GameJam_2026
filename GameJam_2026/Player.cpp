@@ -51,7 +51,7 @@ Player::Player(int x, int y, int screenWidth, int screenHeight)
 
 void Player::move()
 {
-	if (IsKeyDown(KEY_W) && onFloor) {
+	if ((IsKeyDown(KEY_SPACE) || IsKeyDown(KEY_W)) && onFloor) {
 		isColidingTime = 0;
 		velY -= jumpForce;
 	}
@@ -87,7 +87,7 @@ void Player::move()
 }
 void Player::dash()
 {
-	if (IsKeyPressed(KEY_SPACE) && isDashingTime >= DASHING_COOLDOWN && dashCnts) {
+	if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && isDashingTime >= DASHING_COOLDOWN && dashCnts) {
 		float mouseX = GetMousePosition().x;
 		float mouseY = GetMousePosition().y;
 
