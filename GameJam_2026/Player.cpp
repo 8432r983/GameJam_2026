@@ -8,6 +8,8 @@ const float MAX_MOVE_SPEED = 10.f;
 const int DASHING_COOLDOWN = 5;
 const int MAX_DASHES = 2;
 
+const int MAX_VELOCITY_HORIZONTAL = 20.f;
+
 Player::Player(int x, int y, int screenWidth, int screenHeight)
 {
 	posX = x; //position X
@@ -16,8 +18,8 @@ Player::Player(int x, int y, int screenWidth, int screenHeight)
 	m_screenWidth  = screenWidth; 
 	m_screenHeight = screenHeight;
 
-	height = 70; //200; //player height
-	width = 45; //139.1; //player width
+	height = 110; //200; //player height
+	width = 80; //139.1; //player width
 	
 	velX = 0.f; 
 	velY = 0.f;
@@ -145,6 +147,9 @@ void Player::updatePosition()
 {
 	velX += -friction*(velX > 0) + friction*(velX < 0);
 	if (abs(velX) <= friction) velX = 0.f;
+
+	if (velX > MAX_VELOCITY_HORIZONTAL) velX = MAX_VELOCITY_HORIZONTAL;
+	if (velX < -MAX_VELOCITY_HORIZONTAL) velX = -MAX_VELOCITY_HORIZONTAL;
 
 	if (isDashing) onFloor = false;
 
