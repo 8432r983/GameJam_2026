@@ -6,65 +6,12 @@
 #include <iostream>
 #include "Projectile.h"
 #include "Mask.h"
-#include "Track.h"
 
 int main(void)
 {
-	/////////////////////////
-    const int screenWidth = 1280;
-    const int screenHeight = 720;
 
-    InitWindow(screenWidth, screenHeight, "Yirniy");
-
-    SetTargetFPS(60);
-
-    Texture2D startscreen_texture = LoadTexture("textures/startscreen.png");
-    Texture2D startbutton_texture = LoadTexture("textures/startbutton.png");
-
-    Rectangle startscreen_source = { 0.0f, 0.0f, (float)startscreen_texture.width, (float)startscreen_texture.height };
-    Rectangle startscreen_dest = { 0.0f , 0.0f, (float)screenWidth, (float)screenHeight };
-
-    Rectangle startbutton_source = { 0.0f, 0.0f, (float)startbutton_texture.width, (float)startbutton_texture.height };
-    Rectangle startbutton_dest = { (float)(screenWidth / 100) , (float)(screenHeight / 2), (float)startscreen_texture.width * 0.32, (float)startscreen_texture.height * 0.22 };
-
-    Rectangle mouseRec = { 0.0f, 0.0f, 1.0f, 1.0f };
-
-    while (!WindowShouldClose())
-    {
-
-        BeginDrawing();
-
-        ClearBackground(RAYWHITE);
-
-        DrawTexturePro(startscreen_texture, startscreen_source, startscreen_dest, { 0 , 0 }, 0, WHITE);
-
-        if (CheckCollisionRecs(mouseRec, startbutton_dest)) {
-            DrawTexturePro(startbutton_texture, startbutton_source, startbutton_dest, { 0 , 0 }, 0, CLITERAL(Color){ 255, 255, 255, 200 });
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                break;
-            }
-        }
-        else {
-            DrawTexturePro(startbutton_texture, startbutton_source, startbutton_dest, { 0 , 0 }, 0, CLITERAL(Color){ 255, 255, 255, 255 });
-        }
-
-
-
-        mouseRec.x = (float)GetMouseX();
-        mouseRec.y = (float)GetMouseY();
-
-
-
-
-
-        EndDrawing();
-
-    }
-
-
-    CloseWindow();
-	/////////////////////////
-    
+    const int screenWidth = 800;
+    const int screenHeight = 500;
 
     InitWindow(screenWidth, screenHeight, "GameJam 2026");
 
@@ -72,19 +19,12 @@ int main(void)
 	int crFrame = 0;
 	int animFrame = 0;
     int enemyFrameUpdate = 0;
-    /*
-	InitAudioDevice();
 
-	Music main_theme = LoadMusicStream("tracks/fuga.mp3");
-	PlayMusicStream(main_theme);
-    */
 	
 	//PLAYER
-    Player player(200, 50);
-	Enemy1 enemy1(600, 180);
+    Player player(200, 50, screenWidth, screenHeight);
+	//Enemy1 enemy1(600, 180, 0);
 	Mask mask(400, 300);
-
-    Track theme;
 
     //TEXTURES
 	Texture2D playerUP_texture = LoadTexture("./textures/hammer.png");
@@ -101,26 +41,23 @@ int main(void)
     Rectangle playerDOWN_source = { 0.0f, 0.0f, playerDOWN_texture.width / 6, playerDOWN_texture.height };
     Rectangle playerDOWN_dest = { 0.0f , player.height * 0.75, player.width, player.height * 0.25 };
 
-    Rectangle enemy1_source = { 0.0f, 0.0f, enemy1_texture.width / 2, enemy1_texture.height };
-    Rectangle enemy1_dest = { 0.0f , 0.0f, enemy1.width, enemy1.height };
-    Rectangle proj_dest = { 0.0f - enemy1.width / 2 , 0.0f - enemy1.height / 2, enemy1.width, enemy1.height };
-
-    
+    //Rectangle enemy1_source = { 0.0f, 0.0f, enemy1_texture.width / 2, enemy1_texture.height };
+    //Rectangle enemy1_dest = { 0.0f , 0.0f, enemy1.width, enemy1.height };
+    //Rectangle proj_dest = { 0.0f - enemy1.width / 2 , 0.0f - enemy1.height / 2, enemy1.width, enemy1.height };
 
     Texture2D curTexture;
 
-    PlatformHandler platformHandler(screenWidth, screenHeight, 123);
+    PlatformHandler platformHandler(screenWidth, screenHeight, 563, &player, enemy1_texture);
     
     //CAMERA
     Camera2D camera = { 0 };
     camera.target = Vector2{ player.posX + 20.0f, player.posY + 20.0f }; 
     camera.offset = Vector2{ screenWidth / 2.0f, screenHeight / 2.0f };
     camera.rotation = 0.0f;
-    camera.zoom = 1.0f;
+    camera.zoom = 0.35f;
 
     while (!WindowShouldClose())
     {
-        
         BeginDrawing();
 		
         //2D CAMERA
@@ -130,21 +67,22 @@ int main(void)
 
         ClearBackground(GRAY);
 
-        platformHandler.updateMap({(float)player.posX, (float)player.posY});
+        platformHandler.updateMap();
 
         player.move();
-        player.dash();
+        player.onFloor = false;
 		for (int i = 0; i < platformHandler.m_loader.getPlatformsCnt(); i++) {
             player.colidingCheck(platformHandler.m_loader.getPlatform(i));
         }
-        player.updatePosition();
+        player.dash();
+        player.updatePosition();        
 
-       
-		
-        
+        if (IsKeyPressed(KEY_G)) {
+            camera.zoom += -0.02f;
+        }
 
 		//TEXTURES DRAWING// 
-        std::cout << player.hitting << " " << CheckCollisionRecs(player.hitbox_player, mask.hitbox_mask)  << " " << enemy1.playerInRange << '\n';
+        //std::cout << player.hitting << " " << CheckCollisionRecs(player.hitbox_player, mask.hitbox_mask)  << " " << enemy1.cooldown << '\n';
 		//DrawRectangle( (float)player.posX, (float)player.posY, player.width, player.height, BLUE);
         //DrawRectangle((float)enemy1.posX, (float)enemy1.posY, enemy1.width, enemy1.height, GREEN);
         
@@ -156,8 +94,6 @@ int main(void)
             if (animFrame < 3) animFrame++;
             else animFrame = 0;
         }
-
-        //player.drawPlayer();
 
 		//PLAYER TEXTURES
 		//hammer animation
@@ -211,37 +147,26 @@ int main(void)
 
 		
         //DrawText(TextFormat("Frame time: %i", crFrame), 10, 30, 20, DARKGRAY);
-        
-        
 
 		//ENEMY TEXTURES
 
         //FLIPPING
-        if (enemy1.posX < player.posX && enemy1_source.width > 0) {
-            enemy1_source.width *= -1;
-        }
-        else if (enemy1.posX > player.posX && enemy1_source.width < 0) {
-            enemy1_source.width *= -1;
-        }
         
-
-        if (crFrame % 15 == 0) { 
-            enemy1_source.x = enemy1_texture.width / 2 * enemyFrameUpdate; 
-            enemyFrameUpdate++; 
-            if (enemyFrameUpdate > 2) enemyFrameUpdate = 0; 
-        }
+        //if (enemy1.posX < player.posX && enemy1_source.width > 0) {
+        //    enemy1_source.width *= -1;
+        //}
+        //else if (enemy1.posX > player.posX && enemy1_source.width < 0) {
+        //    enemy1_source.width *= -1;
+        //}
         
 		//textures end
         
-        
-        
         player.hit();
-		enemy1.update(player.width, player.height, player.posX, player.posY, player.hitbox_player, player.dmg, player.hitting, enemy1_texture, enemy1_source, enemy1_dest, proj_dest);
-		mask.update(player.hitbox_player);
-        platformHandler.m_loader.drawPlatforms();
 
-		theme.updateMusic(enemy1.playerInRange);
-        
+		//enemy1.update(player.width, player.height, player.posX, player.posY, player.hitbox_player, player.dmg, player.hitting, enemy1_texture, enemy1_source, enemy1_dest, proj_dest);
+		//mask.update(player.hitbox_player);
+
+        platformHandler.m_loader.drawPlatforms();
 
         EndDrawing();
     }
