@@ -12,12 +12,8 @@ public:
 	float height;
 	float width;
 
-
-
-	float velocity_x;
-	float velocity_y;
-	float acceleration_x;
-	float acceleration_y;
+	float velX;
+	float velY;
 
 	float speed;
 	float friction;
@@ -28,15 +24,28 @@ public:
 
 	int isColidingTime;
 
+	bool isDashing;
+	bool isColiding;
+	bool onFloor;
+
+	char facing;
+	bool running;
+	bool hitting;
+	bool inAir;
+	bool inJump;
+
+	Rectangle hitbox_player;
+	int dmg;
+	int health;
+
+	Rectangle floorCollider;
 
 	Player(int x, int y);
 
 	void move();
 	void dash();
-	void move();
+	void updatePosition();
 	void drawPlayer();
-	void movement();
-	
-
-}; 
-
+	void colidingCheck(const Platform& platform);
+	void hit();
+};

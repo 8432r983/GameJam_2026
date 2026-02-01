@@ -2,6 +2,10 @@
 #include "Platform.h"
 #include "Player.h"
 #include "Enemy1.h"
+#include "PlatformHandler.h"
+#include <iostream>
+#include "Projectile.h"
+#include "Mask.h"
 
 int main(void)
 {
@@ -14,17 +18,22 @@ int main(void)
     SetTargetFPS(60);
 	int crFrame = 0;
 	int animFrame = 0;
-	int enemyFrame = 0;
+    int enemyFrameUpdate = 0;
 
+	
 	//PLAYER
     Player player(200, 50);
-	Enemy1 enemy1(600, 300);
+	Enemy1 enemy1(600, 180);
+	Mask mask(400, 300);
 
     //TEXTURES
-	Texture2D playerUP_texture = LoadTexture("hammer.png");
-    Texture2D playerDOWN_texture = LoadTexture("legs.png");
-	Texture2D playerDOWN_JUMP_texture = LoadTexture("legs_jump.png");
-	Texture2D enemy1_texture = LoadTexture("enemy1.png");
+	Texture2D playerUP_texture = LoadTexture("./textures/hammer.png");
+    Texture2D playerDOWN_texture = LoadTexture("./textures/legs.png");
+	Texture2D playerDOWN_JUMP_texture = LoadTexture("./textures/legs_jump.png");
+	Texture2D enemy1_texture = LoadTexture("./textures/enemy1.png");
+	Texture2D platform_texture = LoadTexture("./textures/platform.png");
+
+    
 
     Rectangle playerUP_source = { 0.0f, 0.0f, playerUP_texture.width / 2, playerUP_texture.height };
     Rectangle playerUP_dest = { 0.0f , 0.0f, player.width, player.height * 0.75};
@@ -32,10 +41,15 @@ int main(void)
     Rectangle playerDOWN_source = { 0.0f, 0.0f, playerDOWN_texture.width / 6, playerDOWN_texture.height };
     Rectangle playerDOWN_dest = { 0.0f , player.height * 0.75, player.width, player.height * 0.25 };
 
+    Rectangle enemy1_source = { 0.0f, 0.0f, enemy1_texture.width / 2, enemy1_texture.height };
+    Rectangle enemy1_dest = { 0.0f , 0.0f, enemy1.width, enemy1.height };
+    Rectangle proj_dest = { 0.0f - enemy1.width / 2 , 0.0f - enemy1.height / 2, enemy1.width, enemy1.height };
+
     
 
     Texture2D curTexture;
 
+    PlatformHandler platformHandler(screenWidth, screenHeight, 123);
     
     //CAMERA
     Camera2D camera = { 0 };
@@ -53,32 +67,26 @@ int main(void)
         camera.target = Vector2{ player.posX + 20.0f, player.posY + 20.0f };
         BeginMode2D(camera);
 
-        ClearBackground(WHITE);
+        ClearBackground(GRAY);
 
-	    
+        platformHandler.updateMap({(float)player.posX, (float)player.posY});
 
-		//LOGIC//
+        player.move();
+        player.dash();
+		for (int i = 0; i < platformHandler.m_loader.getPlatformsCnt(); i++) {
+            player.colidingCheck(platformHandler.m_loader.getPlatform(i));
+        }
+        player.updatePosition();
 
-        //Platform placeholder
-        Platform platform1(400, 40, 100, 300);
-        platform1.drawPlatform();
-        
-		//Player Logic
-		player.ground = platform1.isColliding(player.posX + player.width, player.posY + player.height);
-		player.update();
-        player.drawPlayer();
-
-		//Enemy Logic
-		enemy1.drawEnemy1();
-
-        
-
-        //logic end
+       
 		
         
 
 		//TEXTURES DRAWING// 
-
+        std::cout << player.hitting << " " << CheckCollisionRecs(player.hitbox_player, mask.hitbox_mask)  << " " << enemy1.cooldown << '\n';
+		//DrawRectangle( (float)player.posX, (float)player.posY, player.width, player.height, BLUE);
+        //DrawRectangle((float)enemy1.posX, (float)enemy1.posY, enemy1.width, enemy1.height, GREEN);
+        
         //ANIMATION FRAMES CONTROL
         if (crFrame < 60) crFrame++;
         else crFrame = 0;
@@ -88,10 +96,7 @@ int main(void)
             else animFrame = 0;
         }
 
-        if (crFrame % 30 == 0) {
-            if (enemyFrame < 1) enemyFrame++;
-            else enemyFrame = 0;
-        }
+        //player.drawPlayer();
 
 		//PLAYER TEXTURES
 		//hammer animation
@@ -149,19 +154,35 @@ int main(void)
         
 
 		//ENEMY TEXTURES
-        Rectangle enemy1_source = { 0.0f, 0.0f, enemy1_texture.width / 2, enemy1_texture.height };
-        Rectangle enemy1_dest = { 0.0f , 0.0f, enemy1.width, enemy1.height };
 
-        enemy1_source.x = enemy1_texture.width / 2 * (enemyFrame % 2);
-        DrawTexturePro(enemy1_texture, enemy1_source, enemy1_dest, { -1 * (float)enemy1.posX, -1 * (float)enemy1.posY }, 0, WHITE);
+        //FLIPPING
+        if (enemy1.posX < player.posX && enemy1_source.width > 0) {
+            enemy1_source.width *= -1;
+        }
+        else if (enemy1.posX > player.posX && enemy1_source.width < 0) {
+            enemy1_source.width *= -1;
+        }
+        
+
+        if (crFrame % 15 == 0) { 
+            enemy1_source.x = enemy1_texture.width / 2 * enemyFrameUpdate; 
+            enemyFrameUpdate++; 
+            if (enemyFrameUpdate > 2) enemyFrameUpdate = 0; 
+        }
         
 		//textures end
         
         
+        
+        player.hit();
+		enemy1.update(player.width, player.height, player.posX, player.posY, player.hitbox_player, player.dmg, player.hitting, enemy1_texture, enemy1_source, enemy1_dest, proj_dest);
+		mask.update(player.hitbox_player);
+        platformHandler.m_loader.drawPlatforms();
+        
 
         EndDrawing();
     }
-       
+    
     UnloadTexture(playerUP_texture);
     UnloadTexture(playerDOWN_texture);
     CloseWindow();
