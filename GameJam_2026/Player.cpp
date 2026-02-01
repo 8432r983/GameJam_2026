@@ -39,6 +39,10 @@ Player::Player(int x, int y, int screenWidth, int screenHeight)
 	isDashing = false;
 	onFloor = false;
 
+	
+	dmg = 10;
+	health = 100;
+
 	isColidingTime = JUMP_FRAMES_COOLDOWN + 1;
 	isDashingTime = DASHING_COOLDOWN + 1;
 }
@@ -49,15 +53,35 @@ void Player::move()
 		isColidingTime = 0;
 		velY -= jumpForce;
 	}
-	
-	if (IsKeyDown(KEY_A)) {
-		velX += -(speed * (onFloor) + 0.8f * speed * (!onFloor));
-		velX = std::max(velX, -MAX_MOVE_SPEED);
+
+	if (IsKeyDown(KEY_A)) { velX -= speed; facing = 'L'; }
+	if (IsKeyDown(KEY_D)) { velX += speed; facing = 'R'; }
+
+	//check if running
+	if (velX < -1 || velX > 1) {
+		running = true;
 	}
-	if (IsKeyDown(KEY_D)) {
-		velX += speed * (onFloor) + 0.8f * speed * (!onFloor);
-		velX = std::min(velX, MAX_MOVE_SPEED);
+	else {
+		running = false;
 	}
+
+	//check if in air
+	if (velY < -1 || velY > 1) {
+		inAir = true;
+	}
+	else {
+		inAir = false;
+	}
+
+	//check if in jump
+	if (velY < -1) {
+		inJump = true;
+	}
+	else {
+		inJump = false;
+	}
+	if (inAir) velY += 0.3;
+
 }
 void Player::dash()
 {
@@ -139,5 +163,16 @@ void Player::updatePosition()
 	posX += velX;
 	posY += velY;
 	
-	//https://www.youtube.com/watch?v=5Ui51gD3uRE&list=PLCC34OHNcOtpOG96Uwh3VGkmpZ7qTB5dx&index=26
+	hitbox_player = { (float)posX, (float)posY, width, height };
+	
+}
+
+void Player::hit()
+{
+	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+		hitting = true;
+	}/*
+	else {
+		hitting = false;
+	}*/
 }

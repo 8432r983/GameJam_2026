@@ -36,6 +36,17 @@ public:
 	bool isDashing;
 	bool onFloor;
 
+	char facing;
+	bool running;
+	bool hitting;
+	bool inAir;
+	bool inJump;
+
+	Rectangle hitbox_player;
+	int dmg;
+	int health;
+
+	Rectangle floorCollider;
 	Rectangle floorCheck;
 
 	Player(int x, int y, int screenWidth, int screenHeight);
@@ -45,5 +56,5 @@ public:
 	void updatePosition();
 	void drawPlayer();
 	void colidingCheck(const Platform& platform);
-}; 
-
+	void hit();
+};
