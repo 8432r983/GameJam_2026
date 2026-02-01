@@ -1,41 +1,67 @@
 #include "Track.h"
-#include <string>
-
+#include <iostream>
+#include <stdlib.h>
 Track::Track() {
-    splash_music = LoadMusicStream("tracks/fuga.mp3");
-    current_music = splash_music;
-    combat_music = LoadMusicStream("tracks/fuga.mp3");
-    chill_music = LoadMusicStream("tracks/fuga.mp3");
-    current = true;
-    intro_music = LoadMusicStream("tracks/fuga.mp3");
 
-    timePlayed = 0.0f;
-}
-void Track::ResetMusic() {
-    StopMusicStream(current_music);
-    PlayMusicStream(current_music);
-}
-void Track::IntroMusic() {
-    current_music = intro_music;
-    ResetMusic();
+	InitAudioDevice();
+	main_theme = LoadMusicStream("tracks/fuga.mp3");
+	enemy_theme = LoadMusicStream("tracks/rebirth.mp3");
+	main_theme.looping = true;
+
+
+	PlayMusicStream(main_theme);
+	PlayMusicStream(enemy_theme);
+	
+
 }
 
-void Track::StartGameMusic() {
-    current_music = chill_music;
-    ResetMusic();
+
+
+void Track::updateMusic(bool enemyNearby) {
+
+	
+	
+
+	if (enemyNearby) {
+		/*
+		if (cur == 1) {
+
+		float volume1 = 0.0f;
+		float volume2 = 1.0f;
+
+			for (int i = 0; i < 100; i++) {
+				SetMusicVolume(enemy_theme, volume1);
+				SetMusicVolume(main_theme, volume2);
+				UpdateMusicStream(enemy_theme);
+				UpdateMusicStream(main_theme);
+				volume1 += 0.01f;
+				volume2 -= 0.01f;
+
+			}
+		cur = 2;
+		}*/
+
+
+		cur_theme = enemy_theme;
+		std::cout << "Cur theme enemy" << '\n';
+
+		PauseMusicStream(main_theme);
+		ResumeMusicStream(cur_theme);
+		
+	}
+	else {
+
+		cur_theme = main_theme;
+		std::cout << "Cur theme main" << '\n';
+
+		StopMusicStream(enemy_theme);
+		PlayMusicStream(enemy_theme);
+		//PauseMusicStream(enemy_theme);
+		ResumeMusicStream(cur_theme);
+		
+	}
+	
+	UpdateMusicStream(cur_theme);
 }
-void Track::ChangeMusic() {
-    current = !current;
-    if (current) {
-        current_music = chill_music;
-        ResetMusic();
-        SeekMusicStream(chill_music, timePlayed);
-    }
-    else {
-        current_music = combat_music;
-        ResetMusic();
-    }
-}
-void Track::NormalLength() {
-    timePlayed = GetMusicTimePlayed(chill_music);
-}
+
+

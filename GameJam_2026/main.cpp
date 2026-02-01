@@ -6,12 +6,65 @@
 #include <iostream>
 #include "Projectile.h"
 #include "Mask.h"
+#include "Track.h"
 
 int main(void)
 {
-
+	/////////////////////////
     const int screenWidth = 1280;
     const int screenHeight = 720;
+
+    InitWindow(screenWidth, screenHeight, "Yirniy");
+
+    SetTargetFPS(60);
+
+    Texture2D startscreen_texture = LoadTexture("textures/startscreen.png");
+    Texture2D startbutton_texture = LoadTexture("textures/startbutton.png");
+
+    Rectangle startscreen_source = { 0.0f, 0.0f, (float)startscreen_texture.width, (float)startscreen_texture.height };
+    Rectangle startscreen_dest = { 0.0f , 0.0f, (float)screenWidth, (float)screenHeight };
+
+    Rectangle startbutton_source = { 0.0f, 0.0f, (float)startbutton_texture.width, (float)startbutton_texture.height };
+    Rectangle startbutton_dest = { (float)(screenWidth / 100) , (float)(screenHeight / 2), (float)startscreen_texture.width * 0.32, (float)startscreen_texture.height * 0.22 };
+
+    Rectangle mouseRec = { 0.0f, 0.0f, 1.0f, 1.0f };
+
+    while (!WindowShouldClose())
+    {
+
+        BeginDrawing();
+
+        ClearBackground(RAYWHITE);
+
+        DrawTexturePro(startscreen_texture, startscreen_source, startscreen_dest, { 0 , 0 }, 0, WHITE);
+
+        if (CheckCollisionRecs(mouseRec, startbutton_dest)) {
+            DrawTexturePro(startbutton_texture, startbutton_source, startbutton_dest, { 0 , 0 }, 0, CLITERAL(Color){ 255, 255, 255, 200 });
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                break;
+            }
+        }
+        else {
+            DrawTexturePro(startbutton_texture, startbutton_source, startbutton_dest, { 0 , 0 }, 0, CLITERAL(Color){ 255, 255, 255, 255 });
+        }
+
+
+
+        mouseRec.x = (float)GetMouseX();
+        mouseRec.y = (float)GetMouseY();
+
+
+
+
+
+        EndDrawing();
+
+    }
+
+
+    CloseWindow();
+	/////////////////////////
+    
 
     InitWindow(screenWidth, screenHeight, "GameJam 2026");
 
@@ -19,12 +72,19 @@ int main(void)
 	int crFrame = 0;
 	int animFrame = 0;
     int enemyFrameUpdate = 0;
+    /*
+	InitAudioDevice();
 
+	Music main_theme = LoadMusicStream("tracks/fuga.mp3");
+	PlayMusicStream(main_theme);
+    */
 	
 	//PLAYER
     Player player(200, 50);
 	Enemy1 enemy1(600, 180);
 	Mask mask(400, 300);
+
+    Track theme;
 
     //TEXTURES
 	Texture2D playerUP_texture = LoadTexture("./textures/hammer.png");
@@ -60,6 +120,7 @@ int main(void)
 
     while (!WindowShouldClose())
     {
+        
         BeginDrawing();
 		
         //2D CAMERA
@@ -83,7 +144,7 @@ int main(void)
         
 
 		//TEXTURES DRAWING// 
-        std::cout << player.hitting << " " << CheckCollisionRecs(player.hitbox_player, mask.hitbox_mask)  << " " << enemy1.cooldown << '\n';
+        std::cout << player.hitting << " " << CheckCollisionRecs(player.hitbox_player, mask.hitbox_mask)  << " " << enemy1.playerInRange << '\n';
 		//DrawRectangle( (float)player.posX, (float)player.posY, player.width, player.height, BLUE);
         //DrawRectangle((float)enemy1.posX, (float)enemy1.posY, enemy1.width, enemy1.height, GREEN);
         
@@ -178,6 +239,8 @@ int main(void)
 		enemy1.update(player.width, player.height, player.posX, player.posY, player.hitbox_player, player.dmg, player.hitting, enemy1_texture, enemy1_source, enemy1_dest, proj_dest);
 		mask.update(player.hitbox_player);
         platformHandler.m_loader.drawPlatforms();
+
+		theme.updateMusic(enemy1.playerInRange);
         
 
         EndDrawing();

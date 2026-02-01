@@ -1,28 +1,22 @@
 #pragma once
 #include <raylib.h>
 #include <string>
-
+#include "Enemy1.h"
 class Track {
 
 public:
 
-    Music current_music;
-    Music splash_music;
-    Music combat_music;
-    Music chill_music;
-    Music intro_music;
+    Music main_theme;
+    Music enemy_theme;
+	Music cur_theme;
+	Enemy1* enemyPtr;
 
-    bool current;
+	int cur = 1;
 
-    float timePlayed;
 
     Track();
-
-    void ResetMusic();
-    void StartGameMusic();
-    void ChangeMusic();
-    void IntroMusic();
-    void NormalLength();
+	void updateMusic(bool enemyNearby);
+	
 
 };
 
