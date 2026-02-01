@@ -35,7 +35,17 @@ Enemy1::Enemy1(long long id, Texture2D texture)
 
 void Enemy1::drawEnemy1()
 {
-	DrawRectangle(posX, posY, width, height, BLANK);
+	//DrawRectangle(posX, posY, width, height, BLANK);
+
+	if (m_enemySource.width > 0 && m_player->posX > posX ) {
+		m_enemySource.width *= -1;
+	}
+	else if (m_enemySource.width < 0 && m_player->posX < posX) {
+		m_enemySource.width *= -1;
+	}
+
+	DrawTexturePro(m_texture, m_enemySource, m_enemyDest, { -1 * (float)posX, -1 * (float)posY }, 0, CLITERAL(Color){ 255, 255, 255, 255 });
+	DrawTexturePro(m_texture, m_enemySource, m_projDest, { -1 * (float)proj.curPosX, -1 * (float)proj.curPosY }, 0, CLITERAL(Color){ 144, 3, 3, 128 });
 }
 
 void Enemy1::moveEnemy1()
@@ -107,7 +117,7 @@ void Enemy1::update()
 		if (count < 60) count++;
 		else count = 0;
 		if (count % 2 == 0) moveEnemy1();
-		drawEnemy1();
+		
 		if (cooldown != 0) cooldown--;
 		if (playerInRange && cooldown == 0) attack();
 		playerDetection();
@@ -131,7 +141,6 @@ void Enemy1::update()
 			width *= -1;
 		}
 
-		DrawTexturePro(m_texture, m_enemySource, m_enemyDest, { -1 * (float)posX, -1 * (float)posY }, 0, CLITERAL(Color){ 255, 255, 255, 255 });
-		DrawTexturePro(m_texture, m_enemySource, m_projDest, { -1 * (float)proj.curPosX, -1 * (float)proj.curPosY }, 0, CLITERAL(Color){ 144, 3, 3, 128 });
+		drawEnemy1();
 	}
 }
