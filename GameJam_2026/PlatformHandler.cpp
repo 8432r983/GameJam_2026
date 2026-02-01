@@ -148,10 +148,15 @@ void PlatformHandler::updateMap()
 				int dchpx = chpx + i;
 				int dchpy = chpy + j;
 
+				//float coefX = 1;//2.4; // 2 * (float)m_screenWidth / (float)m_screenHeight;
+				//float coefY = 1;//2.3; // (float)m_screenWidth / (float)m_screenHeight;
+
 				Vector2 drawPos = { dchpx * m_screenWidth, dchpy * m_screenHeight };
 
-				if (dchpx % 3 == 0 && dchpy % 3 == 0) {
+				//////////////////////////////////
+				if (dchpx % 3 == 0 && dchpy % 2 == 0) {
 					getRndPlatforms(m_screenHeight, m_screenWidth, drawPos, initialPlatform.width);
+				// getRndPlatforms(360, 640, drawPos, initialPlatform.width);
 				}
 			}
 		}
@@ -160,24 +165,23 @@ void PlatformHandler::updateMap()
 		long long limDist = (long long)sqrt((m_screenWidth) * (m_screenWidth) + 
 											(m_screenHeight) * (m_screenHeight)) * RENDER_DISTANCE;
 		cleanupPlatforms({ playerX, playerY }, limDist);
+		cleanupEnemies(limDist);
+		cleanupMasks(limDist);
 
 		for (int i = 0; i < m_loader.getPlatformsCnt(); i++) {
 			Platform p = m_loader.getPlatform(i);
-			if (p.pos.x != initialPlatform.pos.x && p.pos.y != initialPlatform.pos.y) spawnRandomThing(p);
-		}
-
-		cleanupEnemies(limDist);
-		
-		std::cout << enemies.size() << " " << m_loader.getPlatformsCnt() << '\n';
-
-		// update and draw all enemies
-		for (int i = 0; i < enemies.size(); i++) {
-			enemies[i].update();
-			if (!enemies[i].alive) {
-				clearedPlat[enemies[i].enemyID] = true;
+			if (p.pos.x != initialPlatform.pos.x && p.pos.y != initialPlatform.pos.y) {
+				if(!clearedPlat[createID(p.pos.x, p.pos.y)]) spawnRandomThing(p);
 			}
 		}
+		
+		//std::cout << "e/m/p: " << enemies.size() << " " << masks.size() << " " << m_loader.getPlatformsCnt() << '\n';
 	}
+
+	// update and draw all enemies
+	updateEnemies();
+	// update and draw all masks
+	updateMasks();
 }
 
 void PlatformHandler::spawnRandomEnemy(const Platform& plat)
@@ -189,8 +193,8 @@ void PlatformHandler::spawnRandomEnemy(const Platform& plat)
 	if (dist <= MIN_SPAWN_DIST) return;
 	
 	long long ID = createID(plat.pos.x, plat.pos.y);
-	if (platBusy[ID]) return;
-	platBusy[ID] = true;
+	if (platHasEnemy[ID]) return;
+	platHasEnemy[ID] = true;
 
 	Enemy1 newEnemy(ID, m_enemyTexture);
 
@@ -198,7 +202,7 @@ void PlatformHandler::spawnRandomEnemy(const Platform& plat)
 	
 	newEnemy.health = (rand() % (MAX_ENEMY_HEALTH - MIN_ENEMY_HEALTH)) + MIN_ENEMY_HEALTH;
 	
-	newEnemy.startPos = { plat.pos.x + newEnemy.width / 2, plat.pos.y - newEnemy.height };
+	newEnemy.startPos = { plat.pos.x, plat.pos.y - newEnemy.height };
 	newEnemy.endPos = { plat.pos.x + plat.width - newEnemy.width / 2, plat.pos.y - newEnemy.height };
 	
 	newEnemy.posX = plat.pos.x + newEnemy.width / 2;
@@ -237,19 +241,88 @@ void PlatformHandler::updateEnemies()
 {
 	for (int i = 0; i < enemies.size(); i++) {
 		enemies[i].update();
+		if (!enemies[i].alive) {
+			clearedPlat[enemies[i].enemyID] = true;
+		}
 	}
 }
 
-void PlatformHandler::spawnRandomThing(const Platform& plat)
+void PlatformHandler::spawnRandomMask(Platform plat)
+{
+	int px = m_player->posX;
+	int py = m_player->posY;
+
+	double dist = sqrt((px - plat.pos.x) * (px - plat.pos.x) + (py - plat.pos.y) * (py - plat.pos.y));
+	if (dist <= MIN_SPAWN_DIST) return;
+
+	long long ID = createID(plat.pos.x, plat.pos.y);
+	if (platHasMask[ID]) return;
+	platHasMask[ID] = true;
+
+	Mask newMask;
+
+	int maskType = 1 + (rand() % NUM_OF_MASKS);
+
+	float maskX = plat.pos.x + plat.width/2 -  newMask.size / 2;
+	float maskY = plat.pos.y - plat.height - newMask.size;
+
+	newMask.maskID = ID;
+
+	newMask.posX = maskX;
+	newMask.posY = maskY;
+
+	newMask.hitbox_mask = {(float)maskX, (float)maskY, newMask.size, newMask.size};
+	newMask.type = maskType;
+
+	newMask.player = m_player;
+
+	masks.push_back(newMask);
+}
+
+void PlatformHandler::cleanupMasks(const long long& limDist)
+{
+	std::vector<Mask> newMasks;
+	std::unordered_map<long long, bool> mep;
+
+	for (int i = 0; i < masks.size(); i++) {
+		int mX = masks[i].posX; int pX = m_player->posX;
+		int mY = masks[i].posY; int pY = m_player->posY;
+
+		long long dist = sqrt((pX - mX) * (pX - mX) + (pY - mY) * (pY - mY));
+
+		if (dist <= limDist && !mep[createID(mX, mY)]) {
+			newMasks.push_back(masks[i]);
+			mep[createID(mX, mY)] = true;
+		}
+	}
+
+	masks.clear();
+
+	for (int i = 0; i < newMasks.size(); i++) {
+		masks.push_back(newMasks[i]);
+	}
+}
+
+void PlatformHandler::updateMasks()
+{
+	for (int i = 0; i < masks.size(); i++) {
+		masks[i].update();
+		clearedPlat[masks[i].maskID] = masks[i].isCollected;
+	}
+}
+
+void PlatformHandler::spawnRandomThing(Platform plat)
 {
 	int rnd = rand() % 100;
 
 	if (rnd >= 0 && rnd < MASK_SPAWN_PROB) {
-		//spawnRandomMask(plat);
+		if ((float)masks.size() / (float)m_loader.getPlatformsCnt() <= (float)MASK_SPAWN_PROB / 100.0) {
+			if(!platHasEnemy[createID(plat.pos.x, plat.pos.y)]) spawnRandomMask(plat);
+		}
 	}
 	else if (rnd >= MASK_SPAWN_PROB && rnd < MASK_SPAWN_PROB + ENEMY_SPAWN_PROB) {
 		if ((float)enemies.size() / (float)m_loader.getPlatformsCnt() <= (float)ENEMY_SPAWN_PROB / 100.0) {
-			spawnRandomEnemy(plat);
+			if (!platHasMask[createID(plat.pos.x, plat.pos.y)]) spawnRandomEnemy(plat);
 		}
 	}
 }

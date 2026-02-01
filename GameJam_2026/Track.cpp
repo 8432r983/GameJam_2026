@@ -28,7 +28,7 @@ void Track::updateMusic(bool enemyNearby, bool instart) {
 	if (enemyNearby) {
 	
 		cur_theme = enemy_theme;
-		std::cout << "Cur theme enemy" << '\n';
+		//std::cout << "Cur theme enemy" << '\n';
 
 		PauseMusicStream(main_theme);
 		ResumeMusicStream(cur_theme);
@@ -41,7 +41,7 @@ void Track::updateMusic(bool enemyNearby, bool instart) {
 	else {
 
 		cur_theme = main_theme;
-		std::cout << "Cur theme main" << '\n';
+		//std::cout << "Cur theme main" << '\n';
 
 		StopMusicStream(enemy_theme);
 		PlayMusicStream(enemy_theme);

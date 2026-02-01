@@ -52,22 +52,16 @@ int main(void)
             DrawTexturePro(startbutton_texture, startbutton_source, startbutton_dest, { 0 , 0 }, 0, CLITERAL(Color){ 255, 255, 255, 255 });
         }
 
-
-
         mouseRec.x = (float)GetMouseX();
         mouseRec.y = (float)GetMouseY();
 
         theme.updateMusic(playerNerbay, instart);
 
         EndDrawing();
-
     }
-
 
     CloseWindow();
 	instart = false;
-    /////////////////////////
-
 
     InitWindow(screenWidth, screenHeight, "GameJam 2026");
 
@@ -76,14 +70,10 @@ int main(void)
 	int animFrame = 0;
     int enemyFrameUpdate = 0;
 	
-
-	
 	//PLAYER
     Player player(200, 50, screenWidth, screenHeight);
 	//Enemy1 enemy1(600, 180, 0);
-	Mask mask(400, 300);
-
-    
+	//Mask mask();
 
     //TEXTURES
 	Texture2D playerUP_texture = LoadTexture("./textures/hammer.png");
@@ -91,8 +81,6 @@ int main(void)
 	Texture2D playerDOWN_JUMP_texture = LoadTexture("./textures/legs_jump.png");
 	Texture2D enemy1_texture = LoadTexture("./textures/enemy1.png");
 	Texture2D platform_texture = LoadTexture("./textures/platform.png");
-
-    
 
     Rectangle playerUP_source = { 0.0f, 0.0f, playerUP_texture.width / 2, playerUP_texture.height };
     Rectangle playerUP_dest = { 0.0f , 0.0f, player.width, player.height * 0.75};

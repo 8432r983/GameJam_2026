@@ -1,26 +1,29 @@
 #pragma once
 #include <raylib.h>
+#include "Player.h"
 
 class Mask
 {
 public:
-	char type;
-	int Debuff;
-	int Buff;
+	int type;
 	float size;
 
 	int posX;
 	int posY;
 
+	long long maskID;
+
+	Player* player;
+
 	bool isCollected;
 
 	Rectangle hitbox_mask;
 
-	void drawMask(int x, int y);
-	void collected(Rectangle hitbox_player);
-	void update(Rectangle hitbox_player);
+	void drawMask();
+	void collected();
+	void update();
 
-	Mask(int x, int y);
+	Mask();
 
 };
 

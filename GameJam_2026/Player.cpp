@@ -6,9 +6,9 @@
 const int JUMP_FRAMES_COOLDOWN = 10;
 const float MAX_MOVE_SPEED = 10.f;
 const int DASHING_COOLDOWN = 5;
-const int MAX_DASHES = 2;
+const int MAX_DASHES = 30;//2;
 
-const int MAX_VELOCITY_HORIZONTAL = 20.f;
+const int MAX_VELOCITY_HORIZONTAL = 200000000;//20;
 
 Player::Player(int x, int y, int screenWidth, int screenHeight)
 {
@@ -32,7 +32,7 @@ Player::Player(int x, int y, int screenWidth, int screenHeight)
 	speed = 1.2; //movement speed
 	friction = 0.45; //friction coefficient
 	jumpForce = 13.f; //jump strength
-	dashSpeed = 55.f ; //dash speed
+	dashSpeed = 555.f;//55.f ; //dash speed
 	
 	dashCnts = MAX_DASHES;
 
@@ -87,7 +87,8 @@ void Player::move()
 }
 void Player::dash()
 {
-	if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && isDashingTime >= DASHING_COOLDOWN && dashCnts) {
+	// if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && isDashingTime >= DASHING_COOLDOWN && dashCnts) {
+	if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && isDashingTime >= DASHING_COOLDOWN && dashCnts) {
 		float mouseX = GetMousePosition().x;
 		float mouseY = GetMousePosition().y;
 

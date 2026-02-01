@@ -4,6 +4,7 @@
 #include "PlatformLoader.h"
 #include "Enemy1.h"
 #include "Player.h"
+#include "Mask.h"
 
 #include <unordered_map>
 
@@ -18,7 +19,7 @@ const int initPlatWidth = 200;
 
 const int MAX_ROW_HEIGHT = 3 * DEFAULT_HEIGHT;
 
-const int RENDER_DISTANCE = 3;
+const int RENDER_DISTANCE = 5;
 
 const int MIN_ENEMY_HEALTH = 50;
 const int MAX_ENEMY_HEALTH = 200;
@@ -31,6 +32,8 @@ const int ENEMY_SPAWN_PROB = 20; // x/100
 
 const int MIN_SPAWN_DIST = 500;
 
+const int NUM_OF_MASKS = 2;
+
 class PlatformHandler
 {
 public:
@@ -40,9 +43,11 @@ public:
 	int m_seed;
 
 	std::unordered_map<long long, bool> clearedPlat;
-	std::unordered_map<long long, bool> platBusy;
+	std::unordered_map<long long, bool> platHasEnemy;
+	std::unordered_map<long long, bool> platHasMask;
 
 	std::vector<Enemy1> enemies;
+	std::vector<Mask> masks;
 
 	Platform initialPlatform;
 
@@ -67,6 +72,10 @@ public:
 	void cleanupEnemies(const long long& limDist);
 	void updateEnemies();
 
-	void spawnRandomThing(const Platform& plat);
+	void spawnRandomMask(Platform plat);
+	void cleanupMasks(const long long& limDist);
+	void updateMasks();
+
+	void spawnRandomThing(Platform plat);
 };
 

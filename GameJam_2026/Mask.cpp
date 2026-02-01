@@ -1,26 +1,27 @@
 #include "Mask.h"
+#include <iostream>
 
-Mask::Mask(int x, int y)
+Mask::Mask()
 {
-	posX = x;
-	posY = y;
+	posX = 0;
+	posY = 0;
 	size = 50.0f;
 	hitbox_mask = { (float)posX, (float)posY, size, size };
 	isCollected = false;
 }
 
-void Mask::drawMask(int x, int y)
+void Mask::drawMask()
 {
-	DrawRectangle(x, y, size, size, GREEN);
+	DrawRectangle(posX, posY, size, size, GREEN);
 }
-void Mask::collected(Rectangle hitbox_player)
+void Mask::collected()
 {
-	if (CheckCollisionRecs(hitbox_mask, hitbox_player)) isCollected = true;
+	if (CheckCollisionRecs(hitbox_mask, player->hitbox_player)) isCollected = true;
 }
-void Mask::update(Rectangle hitbox_player)
+void Mask::update()
 {
 	if (!isCollected) { 
-		collected(hitbox_player);
-		drawMask(posX, posY); 
+		collected();
+		drawMask(); 
 	}
 }
