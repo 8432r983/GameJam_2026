@@ -6,12 +6,68 @@
 #include <iostream>
 #include "Projectile.h"
 #include "Mask.h"
+#include "Track.h"
 
 int main(void)
 {
+    /////////////////////////
+    const int screenWidth = 1280;
+    const int screenHeight = 720;
+	bool instart = true;
+    bool playerNerbay = false;
 
-    const int screenWidth = 800;
-    const int screenHeight = 500;
+    Track theme;
+
+    InitWindow(screenWidth, screenHeight, "Yirniy");
+
+    SetTargetFPS(60);
+
+    Texture2D startscreen_texture = LoadTexture("textures/startscreen.png");
+    Texture2D startbutton_texture = LoadTexture("textures/startbutton.png");
+
+    Rectangle startscreen_source = { 0.0f, 0.0f, (float)startscreen_texture.width, (float)startscreen_texture.height };
+    Rectangle startscreen_dest = { 0.0f , 0.0f, (float)screenWidth, (float)screenHeight };
+
+    Rectangle startbutton_source = { 0.0f, 0.0f, (float)startbutton_texture.width, (float)startbutton_texture.height };
+    Rectangle startbutton_dest = { (float)(screenWidth / 100) , (float)(screenHeight / 2), (float)startscreen_texture.width * 0.32, (float)startscreen_texture.height * 0.22 };
+
+    Rectangle mouseRec = { 0.0f, 0.0f, 1.0f, 1.0f };
+
+    while (!WindowShouldClose())
+    {
+
+        BeginDrawing();
+
+        ClearBackground(RAYWHITE);
+
+        DrawTexturePro(startscreen_texture, startscreen_source, startscreen_dest, { 0 , 0 }, 0, WHITE);
+
+        if (CheckCollisionRecs(mouseRec, startbutton_dest)) {
+            DrawTexturePro(startbutton_texture, startbutton_source, startbutton_dest, { 0 , 0 }, 0, CLITERAL(Color){ 255, 255, 255, 200 });
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                break;
+            }
+        }
+        else {
+            DrawTexturePro(startbutton_texture, startbutton_source, startbutton_dest, { 0 , 0 }, 0, CLITERAL(Color){ 255, 255, 255, 255 });
+        }
+
+
+
+        mouseRec.x = (float)GetMouseX();
+        mouseRec.y = (float)GetMouseY();
+
+        theme.updateMusic(playerNerbay, instart);
+
+        EndDrawing();
+
+    }
+
+
+    CloseWindow();
+	instart = false;
+    /////////////////////////
+
 
     InitWindow(screenWidth, screenHeight, "GameJam 2026");
 
@@ -19,12 +75,15 @@ int main(void)
 	int crFrame = 0;
 	int animFrame = 0;
     int enemyFrameUpdate = 0;
+	
 
 	
 	//PLAYER
     Player player(200, 50, screenWidth, screenHeight);
 	//Enemy1 enemy1(600, 180, 0);
 	Mask mask(400, 300);
+
+    
 
     //TEXTURES
 	Texture2D playerUP_texture = LoadTexture("./textures/hammer.png");
@@ -57,7 +116,16 @@ int main(void)
     camera.zoom = 0.35f;
 
     while (!WindowShouldClose())
-    {
+    {   
+		playerNerbay = false;
+        for (int i = 0; i < platformHandler.enemies.size(); i++) {
+            if (platformHandler.enemies[i].playerInRange) {
+                playerNerbay = true;
+                break;
+            }
+        }
+	
+        
         BeginDrawing();
 		
         //2D CAMERA
@@ -167,6 +235,7 @@ int main(void)
 		//mask.update(player.hitbox_player);
 
         platformHandler.m_loader.drawPlatforms();
+        theme.updateMusic(playerNerbay, instart);
 
         EndDrawing();
     }

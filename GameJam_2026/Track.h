@@ -8,6 +8,7 @@ public:
 
     Music main_theme;
     Music enemy_theme;
+	Music start_theme;
 	Music cur_theme;
 	Enemy1* enemyPtr;
 
@@ -15,7 +16,7 @@ public:
 
 
     Track();
-	void updateMusic(bool enemyNearby);
+	void updateMusic(bool enemyNearby, bool instart);
 	
 
 };

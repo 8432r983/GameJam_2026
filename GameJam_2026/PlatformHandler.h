@@ -29,6 +29,8 @@ const int MAX_ENEMY_DAMAGE = 50;
 const int MASK_SPAWN_PROB = 20; // x/100
 const int ENEMY_SPAWN_PROB = 20; // x/100
 
+const int MIN_SPAWN_DIST = 500;
+
 class PlatformHandler
 {
 public:
