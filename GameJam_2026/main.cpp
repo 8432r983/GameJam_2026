@@ -15,6 +15,7 @@ int main(void)
     const int screenHeight = 720;
 	bool instart = true;
     bool playerNerbay = false;
+    int score = 0;
 
     Track theme;
 
@@ -69,19 +70,17 @@ int main(void)
     /////////////////////////
 
 
-    InitWindow(screenWidth, screenHeight, "GameJam 2026");
+    InitWindow(screenWidth, screenHeight, "Yirniy");
 
     SetTargetFPS(60);
 	int crFrame = 0;
 	int animFrame = 0;
     int enemyFrameUpdate = 0;
+    std::vector<Texture2D> masks(2);
+  
 	
-
-	
-	//PLAYER
-    Player player(200, 50, screenWidth, screenHeight);
 	//Enemy1 enemy1(600, 180, 0);
-	Mask mask(400, 300);
+	//Mask mask(400, 300);
 
     
 
@@ -92,13 +91,20 @@ int main(void)
 	Texture2D enemy1_texture = LoadTexture("./textures/enemy1.png");
 	Texture2D platform_texture = LoadTexture("./textures/platform.png");
 
-    
+    masks[0] = LoadTexture("./textures/maska1.png");
+    masks[1] = LoadTexture("./textures/maska2.png");
+
+
+    //PLAYER
+    Player player(200, 50, screenWidth, screenHeight, masks);
 
     Rectangle playerUP_source = { 0.0f, 0.0f, playerUP_texture.width / 2, playerUP_texture.height };
     Rectangle playerUP_dest = { 0.0f , 0.0f, player.width, player.height * 0.75};
 
     Rectangle playerDOWN_source = { 0.0f, 0.0f, playerDOWN_texture.width / 6, playerDOWN_texture.height };
     Rectangle playerDOWN_dest = { 0.0f , player.height * 0.75, player.width, player.height * 0.25 };
+
+    
 
     //Rectangle enemy1_source = { 0.0f, 0.0f, enemy1_texture.width / 2, enemy1_texture.height };
     //Rectangle enemy1_dest = { 0.0f , 0.0f, enemy1.width, enemy1.height };
@@ -117,6 +123,8 @@ int main(void)
 
     while (!WindowShouldClose())
     {   
+        //DrawText("free sprite fonts included with raylib", player.posX, player.posY, 50, DARKGRAY);
+
 		playerNerbay = false;
         for (int i = 0; i < platformHandler.enemies.size(); i++) {
             if (platformHandler.enemies[i].playerInRange) {
@@ -133,7 +141,7 @@ int main(void)
         camera.target = Vector2{ player.posX + 20.0f, player.posY + 20.0f };
         BeginMode2D(camera);
 
-        ClearBackground(GRAY);
+        ClearBackground(WHITE);
 
         platformHandler.updateMap();
 
@@ -143,10 +151,14 @@ int main(void)
             player.colidingCheck(platformHandler.m_loader.getPlatform(i));
         }
         player.dash();
-        player.updatePosition();        
+        player.updatePosition(); 
+		
 
         if (IsKeyPressed(KEY_G)) {
             camera.zoom += -0.02f;
+        }
+        if (IsKeyPressed(KEY_H)) {
+            camera.zoom += 0.02f;
         }
 
 		//TEXTURES DRAWING// 
@@ -171,6 +183,7 @@ int main(void)
 		else if (animFrame > 2) playerUP_source.x = playerUP_texture.width / 2 * 0; player.hitting = false;
 
         DrawTexturePro(playerUP_texture, playerUP_source, playerUP_dest, { -1 * (float)player.posX, -1 * (float)player.posY }, 0, WHITE);
+        player.hasMask(1);
         
 
 		//legs animation
@@ -204,10 +217,12 @@ int main(void)
         if (player.facing == 'R' && playerUP_source.width > 0 && playerDOWN_source.width > 0) {
             playerUP_source.width *= -1;
             playerDOWN_source.width *= -1;
+			//mask_source.width *= -1;
         }
         else if (player.facing == 'L' && playerUP_source.width < 0 && playerDOWN_source.width < 0) {
             playerUP_source.width *= -1;
             playerDOWN_source.width *= -1;
+			//mask_source.width *= -1;    
         }
 
         

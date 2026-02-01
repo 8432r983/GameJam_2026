@@ -22,7 +22,7 @@ Track::Track() {
 
 void Track::updateMusic(bool enemyNearby, bool instart) {
 
-	
+	enemyNearby = false;
 	
 
 	if (enemyNearby) {

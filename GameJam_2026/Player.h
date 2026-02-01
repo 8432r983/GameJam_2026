@@ -2,6 +2,8 @@
 
 #include <raylib.h>
 #include "Platform.h"
+#include <vector>
+#include "Mask.h"
 
 class Player
 {
@@ -21,6 +23,7 @@ public:
 	float speed;
 	float friction;
 	float jumpForce;
+	float jumpForce0;
 	
 	float dashSpeed;
 	float dashDiffX;
@@ -44,12 +47,15 @@ public:
 
 	Rectangle hitbox_player;
 	int dmg;
+	int dmg0;
 	int health;
 
 	Rectangle floorCollider;
 	Rectangle floorCheck;
 
-	Player(int x, int y, int screenWidth, int screenHeight);
+	std::vector<Texture2D> m_masks;
+
+	Player(int x, int y, int screenWidth, int screenHeight, std::vector<Texture2D>& masks);
 
 	void move();
 	void dash();
@@ -57,4 +63,5 @@ public:
 	void drawPlayer();
 	void colidingCheck(const Platform& platform);
 	void hit();
+	void hasMask(int masktype);
 };

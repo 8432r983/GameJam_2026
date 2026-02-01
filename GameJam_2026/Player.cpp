@@ -10,13 +10,16 @@ const int MAX_DASHES = 2;
 
 const int MAX_VELOCITY_HORIZONTAL = 20.f;
 
-Player::Player(int x, int y, int screenWidth, int screenHeight)
+Player::Player(int x, int y, int screenWidth, int screenHeight, std::vector<Texture2D>& masks)
 {
 	posX = x; //position X
 	posY = y; //position Y
 
 	m_screenWidth  = screenWidth; 
 	m_screenHeight = screenHeight;
+	
+	m_masks = {};
+	m_masks = { masks[0], masks[1] };
 
 	height = 110; //200; //player height
 	width = 80; //139.1; //player width
@@ -32,6 +35,7 @@ Player::Player(int x, int y, int screenWidth, int screenHeight)
 	speed = 1.2; //movement speed
 	friction = 0.45; //friction coefficient
 	jumpForce = 13.f; //jump strength
+	jumpForce0 = jumpForce;
 	dashSpeed = 55.f ; //dash speed
 	
 	dashCnts = MAX_DASHES;
@@ -43,6 +47,7 @@ Player::Player(int x, int y, int screenWidth, int screenHeight)
 
 	
 	dmg = 10;
+	dmg0 = dmg;
 	health = 100;
 
 	isColidingTime = JUMP_FRAMES_COOLDOWN + 1;
@@ -180,4 +185,37 @@ void Player::hit()
 	else {
 		hitting = false;
 	}*/
+}
+
+void Player::hasMask(int masktype)
+{	
+	Rectangle mask_source = { 0.0f, 0.0f, m_masks[0].width, m_masks[0].height};
+	Rectangle mask_dest = { 0.0f , 0.0f, width, height * 0.75 };
+
+	if (facing == 'R' && mask_source.width > 0 && mask_source.width > 0) {
+		mask_source.width *= -1;
+	}
+	else if (facing == 'L' && mask_source.width < 0 && mask_source.width < 0) {
+		mask_source.width *= -1;    
+	}
+
+	if (masktype == 0) {
+		dmg = dmg0;
+		jumpForce = jumpForce0;
+	}
+	else if (masktype == 1) {
+		
+		//DrawRectangle((float)posX,(float)posY, m_masks[masktype - 1].width, m_masks[masktype - 1].height, YELLOW);
+		DrawTexturePro(m_masks[masktype - 1], mask_source, mask_dest, { -1 * (float)posX, -1 * (float)posY }, 0 ,WHITE);
+		dmg *= 1.5;
+		jumpForce = jumpForce0;
+
+	}
+	else if (masktype == 2) {
+
+		DrawTexturePro(m_masks[masktype - 1], mask_source, mask_dest, { -1 * (float)posX, -1 * (float)posY }, 0, WHITE);
+		jumpForce *= 1.5;
+		dmg = dmg0;
+
+	}
 }
