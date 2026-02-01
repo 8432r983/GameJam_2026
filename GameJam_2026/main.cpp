@@ -35,7 +35,7 @@ int main(void)
 
     PlatformHandler platHandler(screenWidth, screenHeight, 13);
 
-    Player mainPlayer(400,170);
+    Player mainPlayer(400,170, screenWidth, screenHeight);
 
     while (!WindowShouldClose())
     {
@@ -47,10 +47,11 @@ int main(void)
         //std::cout << platHandler.m_loader.getPlatformsCnt() << '\n';
 
         mainPlayer.move();
-        mainPlayer.dash();
+        mainPlayer.onFloor = false;
         for (int i = 0; i < platHandler.m_loader.getPlatformsCnt(); i++) {
             mainPlayer.colidingCheck(platHandler.m_loader.getPlatform(i));
         }
+        mainPlayer.dash();
         mainPlayer.updatePosition();
 
         playerX = mainPlayer.posX;
@@ -74,7 +75,8 @@ int main(void)
         //velX -= fric * -1 * (velX <= 0) + fric * (velX > 0);
         //velY -= fric * -1 * (velY <= 0) + fric * (velY > 0);
 
-        camera.target = { delayedPlayerX + 20.0f, delayedPlayerY + 20.0f };
+        //camera.target = { delayedPlayerX + 20.0f, delayedPlayerY + 20.0f };
+        camera.target = { playerX, playerY };
 
         if (delayedPlayerX != playerX) {
             if (abs(delayedPlayerX - playerX) <= smoothSpeed) { delayedPlayerX = playerX; smoothSpeed = 4.5f; }
@@ -90,7 +92,7 @@ int main(void)
 
         BeginMode2D(camera);
 
-        ClearBackground(WHITE);
+        ClearBackground(SKYBLUE);
 
         BeginMode2D(camera);
 
