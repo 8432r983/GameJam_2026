@@ -105,12 +105,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Adrian\Documents\raylib_binaries\raylib-5.5_win64_msvc16\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\raylib\raylib-5.5_win64_msvc16\include;%(AdditionalDependencies)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Adrian\Documents\raylib_binaries\raylib-5.5_win64_msvc16\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\raylib\raylib-5.5_win64_msvc16\lib;%(AdditionalDependencies)</AdditionalLibraryDirectories>
       <AdditionalDependencies>raylib.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -135,7 +135,6 @@
     <ClCompile Include="Enemy1.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mask.cpp" />
-    <ClCompile Include="music_test.cpp" />
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="PlatformHandler.cpp" />
     <ClCompile Include="PlatformLoader.cpp" />

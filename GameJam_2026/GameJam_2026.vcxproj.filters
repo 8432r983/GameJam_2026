@@ -42,7 +42,7 @@
     <ClCompile Include="Track.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="music_test.cpp">
+    <ClCompile Include="start.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

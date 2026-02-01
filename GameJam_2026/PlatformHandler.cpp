@@ -186,7 +186,7 @@ void PlatformHandler::spawnRandomEnemy(const Platform& plat)
 	int py = m_player->posY;
 
 	double dist = sqrt((px - plat.pos.x) * (px - plat.pos.x) + (py - plat.pos.y) * (py - plat.pos.y));
-	if (dist <= 1000.f) return;
+	if (dist <= MIN_SPAWN_DIST) return;
 	
 	long long ID = createID(plat.pos.x, plat.pos.y);
 	if (platBusy[ID]) return;
